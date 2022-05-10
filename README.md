@@ -1,2 +1,4 @@
-# automata-exchange-transform-repository
-Automata Exchange Transform Repository
+# Automata Exchange Transform Repository
+
+## Packaging
+`python3 -m build`
