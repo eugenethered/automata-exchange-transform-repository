@@ -12,13 +12,13 @@ class ExchangeTransformRepositoryTestCase(unittest.TestCase):
         options = {
             'REDIS_SERVER_ADDRESS': '192.168.1.90',
             'REDIS_SERVER_PORT': 6379,
-            'EXCHANGE_TRANSFORMATION_KEY': 'test:exchange:transform-rules'
+            'EXCHANGE_TRANSFORMATIONS_KEY': 'test:exchange:transformations'
         }
         self.cache = RedisCacheHolder(options)
         self.repository = ExchangeTransformRepository(options)
 
     def tearDown(self):
-        self.cache.delete('test:exchange:transform-rules')
+        self.cache.delete('test:exchange:transformations')
 
     def test_should_store_and_retrieve_exchange_transform(self):
         exchange_transform = ExchangeTransform('BTCOTC', {
