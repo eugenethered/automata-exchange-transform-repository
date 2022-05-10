@@ -12,7 +12,7 @@ class ExchangeTransformRepositoryTestCase(unittest.TestCase):
         options = {
             'REDIS_SERVER_ADDRESS': '192.168.1.90',
             'REDIS_SERVER_PORT': 6379,
-            'EXCHANGE_TRANSFORMATION_RULES_KEY': 'test:exchange:transform-rules'
+            'EXCHANGE_TRANSFORMATION_KEY': 'test:exchange:transform-rules'
         }
         self.cache = RedisCacheHolder(options)
         self.repository = ExchangeTransformRepository(options)

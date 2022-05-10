@@ -7,7 +7,7 @@ from exchangetransformrepo.ExchangeTransform import ExchangeTransform
 from exchangetransformrepo.repository.serialize.exchange_transform_deserializer import deserialize_exchange_transform
 from exchangetransformrepo.repository.serialize.exchange_transform_serializer import serialize_exchange_transform
 
-EXCHANGE_TRANSFORMATION_RULES_KEY = 'EXCHANGE_TRANSFORMATION_RULES_KEY'
+EXCHANGE_TRANSFORMATION_KEY = 'EXCHANGE_TRANSFORMATION_KEY'
 
 
 class ExchangeTransformRepository:
@@ -19,9 +19,9 @@ class ExchangeTransformRepository:
 
     def __check_options(self):
         if self.options is None:
-            raise MissingOptionError(f'missing option please provide options {EXCHANGE_TRANSFORMATION_RULES_KEY}')
-        if EXCHANGE_TRANSFORMATION_RULES_KEY not in self.options:
-            raise MissingOptionError(f'missing option please provide option {EXCHANGE_TRANSFORMATION_RULES_KEY}')
+            raise MissingOptionError(f'missing option please provide options {EXCHANGE_TRANSFORMATION_KEY}')
+        if EXCHANGE_TRANSFORMATION_KEY not in self.options:
+            raise MissingOptionError(f'missing option please provide option {EXCHANGE_TRANSFORMATION_KEY}')
 
     def store(self, exchange_transform):
         if type(exchange_transform) is ExchangeTransform:
@@ -40,13 +40,12 @@ class ExchangeTransformRepository:
             self.store(all_exchange_transform)
 
     def __store_all(self, exchange_transformations):
-        key = self.options[EXCHANGE_TRANSFORMATION_RULES_KEY]
+        key = self.options[EXCHANGE_TRANSFORMATION_KEY]
         entities_to_store = list([serialize_exchange_transform(exchange_transform) for exchange_transform in exchange_transformations])
         self.cache.store(key, entities_to_store)
 
     def retrieve(self) -> List[ExchangeTransform]:
-        key = self.options[EXCHANGE_TRANSFORMATION_RULES_KEY]
+        key = self.options[EXCHANGE_TRANSFORMATION_KEY]
         raw_entities = self.cache.fetch(key, as_type=list)
         entities = list([deserialize_exchange_transform(raw) for raw in raw_entities])
         return entities
-
