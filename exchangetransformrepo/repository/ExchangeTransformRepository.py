@@ -1,3 +1,4 @@
+import logging
 from typing import List
 
 from cache.holder.RedisCacheHolder import RedisCacheHolder
@@ -13,14 +14,17 @@ EXCHANGE_TRANSFORMATIONS_KEY = 'EXCHANGE_TRANSFORMATIONS_KEY'
 class ExchangeTransformRepository:
 
     def __init__(self, options):
+        self.log = logging.getLogger('ExchangeTransformRepository')
         self.options = options
         self.__check_options()
         self.cache = RedisCacheHolder()
 
     def __check_options(self):
         if self.options is None:
+            self.log.warning(f'missing option please provide options {EXCHANGE_TRANSFORMATIONS_KEY}')
             raise MissingOptionError(f'missing option please provide options {EXCHANGE_TRANSFORMATIONS_KEY}')
         if EXCHANGE_TRANSFORMATIONS_KEY not in self.options:
+            self.log.warning(f'missing option please provide option {EXCHANGE_TRANSFORMATIONS_KEY}')
             raise MissingOptionError(f'missing option please provide option {EXCHANGE_TRANSFORMATIONS_KEY}')
 
     def store(self, exchange_transform):
