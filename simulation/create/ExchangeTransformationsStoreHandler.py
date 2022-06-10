@@ -18,7 +18,8 @@ class ExchangeTransformationsStoreHandler:
             }),
             ExchangeTransform('OTCBTC', {
                     'instruments': 'OTC/BTC'
-            })
+            }),
+            ExchangeTransform('OTCUSDT', ignore=True)
         ]
 
     def store_exchange_transformations(self):
