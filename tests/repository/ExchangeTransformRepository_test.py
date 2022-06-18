@@ -1,3 +1,4 @@
+import logging
 import unittest
 
 from cache.holder.RedisCacheHolder import RedisCacheHolder
@@ -9,16 +10,20 @@ from exchangetransformrepo.repository.ExchangeTransformRepository import Exchang
 class ExchangeTransformRepositoryTestCase(unittest.TestCase):
 
     def setUp(self) -> None:
+        logging.basicConfig(level=logging.INFO)
+        logger = logging.getLogger('ExchangeTransformRepository')
+        logger.setLevel(logging.DEBUG)
+
         options = {
             'REDIS_SERVER_ADDRESS': '192.168.1.90',
             'REDIS_SERVER_PORT': 6379,
-            'EXCHANGE_TRANSFORMATIONS_KEY': 'test:exchange:transformations'
+            'EXCHANGE_TRANSFORMATIONS_KEY': 'test:transformation:exchange'
         }
         self.cache = RedisCacheHolder(options)
         self.repository = ExchangeTransformRepository(options)
 
     def tearDown(self):
-        self.cache.delete('test:exchange:transformations')
+        self.cache.delete('test:transformation:exchange')
 
     def test_should_store_and_retrieve_exchange_transform(self):
         exchange_transform = ExchangeTransform('BTCOTC', {

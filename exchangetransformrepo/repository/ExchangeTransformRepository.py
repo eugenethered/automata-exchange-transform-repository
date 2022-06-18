@@ -15,6 +15,7 @@ class ExchangeTransformRepository:
 
     def __init__(self, options):
         self.log = logging.getLogger('ExchangeTransformRepository')
+        self.log.info('initializing')
         self.options = options
         self.__check_options()
         self.cache = RedisCacheHolder()
@@ -27,18 +28,26 @@ class ExchangeTransformRepository:
             self.log.warning(f'missing option please provide option {EXCHANGE_TRANSFORMATIONS_KEY}')
             raise MissingOptionError(f'missing option please provide option {EXCHANGE_TRANSFORMATIONS_KEY}')
 
+    def append(self, exchange_transform):
+        self.log.debug(f'appending exchange transform [{exchange_transform}]')
+        self.__store_overwrite(exchange_transform)
+
     def store(self, exchange_transform):
         if type(exchange_transform) is ExchangeTransform:
+            self.log.debug(f'append exchange transform [{exchange_transform}]')
             self.__store_overwrite(exchange_transform)
         elif type(exchange_transform) is list:
+            self.log.debug(f'overwriting exchange transforms [{len(exchange_transform)}]')
             self.__store_all(exchange_transform)
 
     def __store_overwrite(self, exchange_transform: ExchangeTransform):
         all_exchange_transform = self.retrieve()
         if exchange_transform not in all_exchange_transform:
+            self.log.debug(f'append new exchange transform [{exchange_transform}]')
             all_exchange_transform.append(exchange_transform)
             self.store(all_exchange_transform)
         else:
+            self.log.debug(f'append replace exchange transform [{exchange_transform}]')
             all_exchange_transform = list([et for et in all_exchange_transform if et != exchange_transform])
             all_exchange_transform.append(exchange_transform)
             self.store(all_exchange_transform)
