@@ -29,14 +29,14 @@ class ExchangeTransformRepositoryTestCase(unittest.TestCase):
         exchange_transform = ExchangeTransform('BTCOTC', {
             'instruments': 'BTC/OTC'
         })
-        self.repository.store(exchange_transform)
+        self.repository.append(exchange_transform)
         stored_exchange_transformations = self.repository.retrieve()
         self.assertEqual(exchange_transform, stored_exchange_transformations[0])
 
     def test_should_store_and_retrieve_exchange_ignore_transform(self):
         exchange_transform = ExchangeTransform('BTCOTC')
         exchange_transform.ignore = True
-        self.repository.store(exchange_transform)
+        self.repository.append(exchange_transform)
         stored_exchange_transformations = self.repository.retrieve()
         self.assertEqual(exchange_transform, stored_exchange_transformations[0])
 

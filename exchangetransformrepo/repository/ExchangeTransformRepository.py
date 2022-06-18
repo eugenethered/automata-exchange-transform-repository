@@ -32,13 +32,9 @@ class ExchangeTransformRepository:
         self.log.debug(f'appending exchange transform [{exchange_transform}]')
         self.__store_overwrite(exchange_transform)
 
-    def store(self, exchange_transform):
-        if type(exchange_transform) is ExchangeTransform:
-            self.log.debug(f'append exchange transform [{exchange_transform}]')
-            self.__store_overwrite(exchange_transform)
-        elif type(exchange_transform) is list:
-            self.log.debug(f'overwriting exchange transforms [{len(exchange_transform)}]')
-            self.__store_all(exchange_transform)
+    def store(self, exchange_transforms):
+        self.log.debug(f'overwriting exchange transforms [{len(exchange_transforms)}]')
+        self.__store_all(exchange_transforms)
 
     def __store_overwrite(self, exchange_transform: ExchangeTransform):
         all_exchange_transform = self.retrieve()
@@ -61,4 +57,5 @@ class ExchangeTransformRepository:
         key = self.options[EXCHANGE_TRANSFORMATIONS_KEY]
         raw_entities = self.cache.fetch(key, as_type=list)
         entities = list([deserialize_exchange_transform(raw) for raw in raw_entities])
+        self.log.debug(f'Retrieving exchange transforms [{len(entities)}]')
         return entities
