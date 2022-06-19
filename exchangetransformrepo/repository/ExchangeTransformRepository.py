@@ -59,3 +59,9 @@ class ExchangeTransformRepository:
         entities = list([deserialize_exchange_transform(raw) for raw in raw_entities])
         self.log.debug(f'Retrieving exchange transforms [{len(entities)}]')
         return entities
+
+    def remove(self, exchange_transform):
+        all_exchange_transform = self.retrieve()
+        self.log.debug(f'removing exchange transform [{exchange_transform}]')
+        all_exchange_transform = list([et for et in all_exchange_transform if et != exchange_transform])
+        self.store(all_exchange_transform)
