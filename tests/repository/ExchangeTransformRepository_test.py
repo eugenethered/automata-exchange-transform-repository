@@ -2,6 +2,7 @@ import logging
 import unittest
 
 from cache.holder.RedisCacheHolder import RedisCacheHolder
+from cache.provider.RedisCacheProviderWithHash import RedisCacheProviderWithHash
 
 from exchangetransformrepo.ExchangeTransform import ExchangeTransform
 from exchangetransformrepo.repository.ExchangeTransformRepository import ExchangeTransformRepository
@@ -19,7 +20,7 @@ class ExchangeTransformRepositoryTestCase(unittest.TestCase):
             'REDIS_SERVER_PORT': 6379,
             'EXCHANGE_TRANSFORMATIONS_KEY': 'test:transformation:exchange'
         }
-        self.cache = RedisCacheHolder(options)
+        self.cache = RedisCacheHolder(options, held_type=RedisCacheProviderWithHash)
         self.repository = ExchangeTransformRepository(options)
 
     def tearDown(self):
@@ -29,14 +30,14 @@ class ExchangeTransformRepositoryTestCase(unittest.TestCase):
         exchange_transform = ExchangeTransform('BTCOTC', {
             'instruments': 'BTC/OTC'
         })
-        self.repository.append(exchange_transform)
+        self.repository.create(exchange_transform)
         stored_exchange_transformations = self.repository.retrieve()
         self.assertEqual(exchange_transform, stored_exchange_transformations[0])
 
     def test_should_store_and_retrieve_exchange_ignore_transform(self):
         exchange_transform = ExchangeTransform('BTCOTC')
         exchange_transform.ignore = True
-        self.repository.append(exchange_transform)
+        self.repository.create(exchange_transform)
         stored_exchange_transformations = self.repository.retrieve()
         self.assertEqual(exchange_transform, stored_exchange_transformations[0])
 
@@ -53,6 +54,9 @@ class ExchangeTransformRepositoryTestCase(unittest.TestCase):
         exchange_transformations = [exchange_transform_1, exchange_transform_2, exchange_transform_3]
         self.repository.store(exchange_transformations)
         stored_exchange_transformations = self.repository.retrieve()
+        # sort to compare
+        exchange_transformations.sort(key=lambda e: e.instrument)
+        stored_exchange_transformations.sort(key=lambda e: e.instrument)
         self.assertEqual(exchange_transformations, stored_exchange_transformations)
 
 

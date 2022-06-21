@@ -2,6 +2,7 @@ import logging
 from typing import List
 
 from cache.holder.RedisCacheHolder import RedisCacheHolder
+from cache.provider.RedisCacheProviderWithHash import RedisCacheProviderWithHash
 from core.options.exception.MissingOptionError import MissingOptionError
 
 from exchangetransformrepo.ExchangeTransform import ExchangeTransform
@@ -18,7 +19,7 @@ class ExchangeTransformRepository:
         self.log.info('initializing')
         self.options = options
         self.__check_options()
-        self.cache = RedisCacheHolder()
+        self.cache = RedisCacheHolder(held_type=RedisCacheProviderWithHash)
 
     def __check_options(self):
         if self.options is None:
@@ -28,40 +29,29 @@ class ExchangeTransformRepository:
             self.log.warning(f'missing option please provide option {EXCHANGE_TRANSFORMATIONS_KEY}')
             raise MissingOptionError(f'missing option please provide option {EXCHANGE_TRANSFORMATIONS_KEY}')
 
-    def append(self, exchange_transform):
+    def store_key(self):
+        return self.options[EXCHANGE_TRANSFORMATIONS_KEY]
+
+    @staticmethod
+    def value_key(exchange_transform):
+        return f'{exchange_transform["instrument"]}'
+
+    def create(self, exchange_transform):
         self.log.debug(f'appending exchange transform [{exchange_transform}]')
-        self.__store_overwrite(exchange_transform)
+        serialized_entity = serialize_exchange_transform(exchange_transform)
+        self.cache.values_set_value(self.store_key(), self.value_key(serialized_entity), serialized_entity)
+
+    def remove(self, exchange_transform):
+        serialized_entity = serialize_exchange_transform(exchange_transform)
+        self.cache.values_delete_value(self.store_key(), self.value_key(serialized_entity))
 
     def store(self, exchange_transforms):
         self.log.debug(f'overwriting exchange transforms [{len(exchange_transforms)}]')
-        self.__store_all(exchange_transforms)
-
-    def __store_overwrite(self, exchange_transform: ExchangeTransform):
-        all_exchange_transform = self.retrieve()
-        if exchange_transform not in all_exchange_transform:
-            self.log.debug(f'append new exchange transform [{exchange_transform}]')
-            all_exchange_transform.append(exchange_transform)
-            self.store(all_exchange_transform)
-        else:
-            self.log.debug(f'append replace exchange transform [{exchange_transform}]')
-            all_exchange_transform = list([et for et in all_exchange_transform if et != exchange_transform])
-            all_exchange_transform.append(exchange_transform)
-            self.store(all_exchange_transform)
-
-    def __store_all(self, exchange_transformations):
-        key = self.options[EXCHANGE_TRANSFORMATIONS_KEY]
-        entities_to_store = list([serialize_exchange_transform(exchange_transform) for exchange_transform in exchange_transformations])
-        self.cache.store(key, entities_to_store)
+        serialized_entities = list([serialize_exchange_transform(exchange_transform) for exchange_transform in exchange_transforms])
+        self.cache.values_store(self.store_key(), serialized_entities, custom_key=self.value_key)
 
     def retrieve(self) -> List[ExchangeTransform]:
-        key = self.options[EXCHANGE_TRANSFORMATIONS_KEY]
-        raw_entities = self.cache.fetch(key, as_type=list)
+        raw_entities = self.cache.values_fetch(self.store_key())
         entities = list([deserialize_exchange_transform(raw) for raw in raw_entities])
         self.log.debug(f'Retrieving exchange transforms [{len(entities)}]')
         return entities
-
-    def remove(self, exchange_transform):
-        all_exchange_transform = self.retrieve()
-        self.log.debug(f'removing exchange transform [{exchange_transform}]')
-        all_exchange_transform = list([et for et in all_exchange_transform if et != exchange_transform])
-        self.store(all_exchange_transform)
