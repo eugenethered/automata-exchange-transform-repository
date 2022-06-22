@@ -37,15 +37,18 @@ class ExchangeTransformRepository:
         return f'{exchange_transform["instrument"]}'
 
     def create(self, exchange_transform):
-        self.log.debug(f'appending exchange transform [{exchange_transform}]')
+        self.update(exchange_transform)
+
+    def update(self, exchange_transform):
+        self.log.debug(f'setting exchange transform [{exchange_transform}]')
         serialized_entity = serialize_exchange_transform(exchange_transform)
         self.cache.values_set_value(self.store_key(), self.value_key(serialized_entity), serialized_entity)
 
-    def remove(self, exchange_transform):
+    def delete(self, exchange_transform):
         serialized_entity = serialize_exchange_transform(exchange_transform)
         self.cache.values_delete_value(self.store_key(), self.value_key(serialized_entity))
 
-    def store(self, exchange_transforms):
+    def store_all(self, exchange_transforms):
         self.log.debug(f'overwriting exchange transforms [{len(exchange_transforms)}]')
         serialized_entities = list([serialize_exchange_transform(exchange_transform) for exchange_transform in exchange_transforms])
         self.cache.values_store(self.store_key(), serialized_entities, custom_key=self.value_key)

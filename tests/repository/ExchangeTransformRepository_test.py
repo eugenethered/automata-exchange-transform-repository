@@ -51,7 +51,7 @@ class ExchangeTransformRepositoryTestCase(unittest.TestCase):
         exchange_transform_3 = ExchangeTransform('GBPOTC')
         exchange_transform_3.ignore = True
         exchange_transformations = [exchange_transform_1, exchange_transform_2, exchange_transform_3]
-        self.repository.store(exchange_transformations)
+        self.repository.store_all(exchange_transformations)
         stored_exchange_transformations = self.repository.retrieve()
         # sort to compare
         exchange_transformations.sort(key=lambda e: e.instrument)
