@@ -12,8 +12,7 @@ class ExchangeTransformRepositoryTestCase(unittest.TestCase):
 
     def setUp(self) -> None:
         logging.basicConfig(level=logging.INFO)
-        logger = logging.getLogger('ExchangeTransformRepository')
-        logger.setLevel(logging.DEBUG)
+        logging.getLogger('ExchangeTransformRepository').setLevel(logging.DEBUG)
 
         options = {
             'REDIS_SERVER_ADDRESS': '192.168.1.90',

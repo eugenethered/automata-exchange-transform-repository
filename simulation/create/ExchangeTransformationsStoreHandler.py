@@ -1,4 +1,5 @@
 from cache.holder.RedisCacheHolder import RedisCacheHolder
+from cache.provider.RedisCacheProviderWithHash import RedisCacheProviderWithHash
 
 from exchangetransformrepo.ExchangeTransform import ExchangeTransform
 from exchangetransformrepo.repository.ExchangeTransformRepository import ExchangeTransformRepository
@@ -7,7 +8,7 @@ from exchangetransformrepo.repository.ExchangeTransformRepository import Exchang
 class ExchangeTransformationsStoreHandler:
 
     def __init__(self, options):
-        RedisCacheHolder(options)
+        RedisCacheHolder(options, held_type=RedisCacheProviderWithHash)
         self.repository = ExchangeTransformRepository(options)
 
     @staticmethod
